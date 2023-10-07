@@ -34,7 +34,7 @@ def create_asm_com():
     input_file = filedialog.askopenfilename(filetypes=[("Assembly Files", "*.asm *.s")])
     text.insert(tk.END, input_file+"\r\n")
     output_file = os.path.splitext(os.path.basename(input_file))[0]
-    execute_command(f"nasm \"{input_file}\" -o {output_file}.com")
+    execute_command(f"nasm \"{output_file}.asm\" -o {output_file}.com")
     execute_command(f"mv {output_file}.com /tmp/cd/isolinux")
     text.insert(tk.END, "done\r\n")
 
@@ -43,7 +43,7 @@ def create_com32_asm():
     input_file = filedialog.askopenfilename(filetypes=[("Assembly Files", "*.asm *.s")])
     text.insert(tk.END, input_file+"\r\n")
     output_file = os.path.splitext(os.path.basename(input_file))[0]
-    execute_command(f"nasm  \"{input_file}\" -o {output_file}.c32")
+    execute_command(f"nasm  \"{output_file}.asm\" -o {output_file}.c32")
     execute_command(f"mv {output_file}.c32 /tmp/cd/isolinux")
     text.insert(tk.END, "done\r\n")
 
@@ -53,7 +53,7 @@ def create_bcc_exec():
     text.insert(tk.END, input_file+"\r\n")
     output_file = os.path.splitext(os.path.basename(input_file))[0]
     execute_command(f"bcc -c -Md libdos.c -o libdos.a")
-    execute_command(f"bcc -x -i -L \"{input_file}\" {output_file}.com")
+    execute_command(f"bcc -x -i -L \"{output_file}.c\" {output_file}.com")
     execute_command(f"mv {output_file}.com /tmp/cd/isolinux")
     text.insert(tk.END, "done\r\n")
 
@@ -63,7 +63,7 @@ def nasm_elf32():
     output_file = os.path.splitext(os.path.basename(input_file))[0]
     text.insert(tk.END, input_file+"\r\n")
     execute_command(f"nasm -felf32 boot.S -o boot.o")
-    execute_command(f"gcc -c \"{input_file}\" -o {output_file}.o -nostdlib")
+    execute_command(f"gcc -c \"{output_file}.asm\" -o {output_file}.o -nostdlib")
     
     execute_command(f"gcc link.ld boot.o {output_file}.o -o {output_file}.elf -nostdlib")
     execute_command(f"nasm model.asm -o model.o")
@@ -88,7 +88,8 @@ def copy_isolinux_cfg():
     input_file = filedialog.askopenfilename(filetypes=[("All Files", "*.*")])
     text.insert(tk.END, input_file+"\r\n")
     output_file = f"/tmp/isolinux/output.com"
-    execute_command(f"cp \"{input_file}\" /tmp/cd/isolinux")
+    outputs_file = os.path.splitext(os.path.basename(input_file))[0]
+    execute_command(f"cp \"{outputs_file}.raw\" /tmp/cd/isolinux")
     text.insert(tk.END, "done\r\n")
 
 def qemu_run():
